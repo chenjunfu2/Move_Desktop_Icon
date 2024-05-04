@@ -9,12 +9,31 @@
 HWND GetDesktopListView(void)
 {
 	HWND hWorkerW = NULL, hSHELLDLL_DefView = NULL, hSysListView32 = NULL;
+	DWORD dwCurrent = 0;
+	struct
+	{
+		const char *cpClassName;
+		const char *cpWindowName;
+	}stFindInfo[]=
+	{
+		{"WorkerW","",},//win10其它
+		{"Progman","Program Manager",},//win7、win10专业版
+	};
+	const DWORD dwFindInfoSize = sizeof(stFindInfo) / sizeof(stFindInfo[0]);
+
 	while (true)
 	{
-		hWorkerW = FindWindowExA(NULL, hWorkerW, "WorkerW", "");
+		hWorkerW = FindWindowExA(NULL, hWorkerW, stFindInfo[dwCurrent].cpClassName, stFindInfo[dwCurrent].cpWindowName);
 		if (hWorkerW == NULL)
 		{
-			continue;
+			if (++dwCurrent < dwFindInfoSize)
+			{
+				continue;
+			}
+			else
+			{
+				return NULL;
+			}
 		}
 
 		hSHELLDLL_DefView = FindWindowExA(hWorkerW, NULL, "SHELLDLL_DefView", "");
@@ -37,9 +56,9 @@ HWND GetDesktopListView(void)
 	return NULL;
 }
 
-int GetRandom(int min, int max)
+int GetRandom(int iMin, int iMax)
 {
-	return rand() % (max - min + 1) + min;
+	return rand() % (iMax - iMin + 1) + iMin;
 }
 
 
@@ -77,8 +96,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		
 		//移动
 		ListView_SetItemPosition(hDesktopListView, iRandItem, iRandItemX, iRandItemY);
-
-		//break;//记得去掉break，否则只会移动一次
 	}
 
 
