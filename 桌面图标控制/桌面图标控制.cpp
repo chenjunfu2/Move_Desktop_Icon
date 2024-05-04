@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include <Commctrl.h>
+#include <time.h>
 
 //获取桌面ListView
 HWND GetDesktopListView(void)
@@ -38,6 +39,11 @@ HWND GetDesktopListView(void)
 
 
 
+int GetRandom(int min, int max)
+{
+	return rand() % (max - min + 1) + min;
+}
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -45,6 +51,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_ int       nCmdShow)
 {
 	HWND hDesktopListView = GetDesktopListView();
+	srand((unsigned int)time(NULL));
 
 	//设置桌面对齐方式（取消对齐）
 	DWORD dwExStyle = ListView_GetExtendedListViewStyle(hDesktopListView);
@@ -56,18 +63,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	const int iDesktopX = GetSystemMetrics(SM_CXFULLSCREEN);
 	const int iDesktopY = GetSystemMetrics(SM_CYFULLSCREEN);
 
+	srand((unsigned int)time(NULL));
+
 	while (true)
 	{
-		//随机一个图标下标不大于等于iItemCount,随机一个x和y坐标分别不大于等于iDesktopX和iDesktopY
-		//然后传递给ListView_SetItemPosition进行图标移动，接着再次循环，就能让桌面图标随机移动
+		//选择任意一个桌面图标
+		int iRandItem = GetRandom(0, (iItemCount - 1));
+		//选择任意一个新的随机图标XY位置
+		int iRandItemX = GetRandom(0, (iDesktopX - 1));
+		int iRandItemY = GetRandom(0, (iDesktopY - 1));
+		
+		//移动
+		ListView_SetItemPosition(hDesktopListView, iRandItem, iRandItemX, iRandItemY);
 
-		//移动图标0到坐标100 100的位置：ListView_SetItemPosition(hDesktopListView, 0, 100, 100);
-		//重绘所有图标：ListView_RedrawItems(hDesktopListView, 0, ListView_GetItemCount(hDesktopListView) - 1);
-		//更新窗口：UpdateWindow(hDesktopListView);
-
-		break;
+		break;//记得去掉break，否则只会移动一次
 	}
 
 
 	return 0;
 }
+
+//移动图标0到坐标100 100的位置：ListView_SetItemPosition(hDesktopListView, 0, 100, 100);
+//重绘所有图标：ListView_RedrawItems(hDesktopListView, 0, ListView_GetItemCount(hDesktopListView) - 1);
+//更新窗口：UpdateWindow(hDesktopListView);
