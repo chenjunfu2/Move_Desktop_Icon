@@ -4,6 +4,7 @@
 #include "framework.h"
 #include <Commctrl.h>
 #include <time.h>
+#include <random>
 
 //获取桌面ListView
 HWND GetDesktopListView(void)
@@ -56,12 +57,6 @@ HWND GetDesktopListView(void)
 	return NULL;
 }
 
-int GetRandom(int iMin, int iMax)
-{
-	return rand() % (iMax - iMin + 1) + iMin;
-}
-
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
 					 _In_ LPWSTR    lpCmdLine,
@@ -84,20 +79,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	const int iDesktopX = GetSystemMetrics(SM_CXFULLSCREEN);
 	const int iDesktopY = GetSystemMetrics(SM_CYFULLSCREEN);
 
-	srand((unsigned int)time(NULL));
+	std::mt19937 csRandom((unsigned int)time(NULL));//初始化随机数种子
+	std::uniform_int_distribution<int> iRandItem(0, (iItemCount - 1));//选择任意一个桌面图标
+	std::uniform_int_distribution<int> iRandItemX(0, (iDesktopX - 1));//选择任意一个新的随机图标X位置
+	std::uniform_int_distribution<int> iRandItemY(0, (iDesktopY - 1));//选择任意一个新的随机图标Y位置
 
 	while (true)
-	{
-		//选择任意一个桌面图标
-		int iRandItem = GetRandom(0, (iItemCount - 1));
-		//选择任意一个新的随机图标XY位置
-		int iRandItemX = GetRandom(0, (iDesktopX - 1));
-		int iRandItemY = GetRandom(0, (iDesktopY - 1));
-		
-		//移动
-		ListView_SetItemPosition(hDesktopListView, iRandItem, iRandItemX, iRandItemY);
+	{	
+		//随机移动
+		ListView_SetItemPosition(hDesktopListView, iRandItem(csRandom), iRandItemX(csRandom), iRandItemY(csRandom));
 	}
-
 
 	return 0;
 }
