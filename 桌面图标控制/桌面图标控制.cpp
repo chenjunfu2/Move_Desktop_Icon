@@ -37,8 +37,6 @@ HWND GetDesktopListView(void)
 	return NULL;
 }
 
-
-
 int GetRandom(int min, int max)
 {
 	return rand() % (max - min + 1) + min;
@@ -51,7 +49,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_ int       nCmdShow)
 {
 	HWND hDesktopListView = GetDesktopListView();
-	srand((unsigned int)time(NULL));
+	if (hDesktopListView == NULL)
+	{
+		MessageBoxA(NULL, "NULL", "GetDesktopListView", MB_OK);
+		return -1;
+	}
 
 	//设置桌面对齐方式（取消对齐）
 	DWORD dwExStyle = ListView_GetExtendedListViewStyle(hDesktopListView);
@@ -76,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//移动
 		ListView_SetItemPosition(hDesktopListView, iRandItem, iRandItemX, iRandItemY);
 
-		break;//记得去掉break，否则只会移动一次
+		//break;//记得去掉break，否则只会移动一次
 	}
 
 
